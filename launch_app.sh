@@ -5,17 +5,8 @@ set -e
 CONFIG_DIR="config"
 ENV_FILE="$CONFIG_DIR/.env"
 SERVER_CONFIG="$CONFIG_DIR/server_config.json"
-MODELS=("gemini" "openai")
 
-echo "Select the AI model you want to use:"
-select model in "${MODELS[@]}"; do
-    if [[ -n "$model" ]]; then
-        echo "You selected: $model"
-        break
-    else
-        echo "Invalid selection. Try again."
-    fi
-done
+echo "The select AI model Gemini:"
 
 read -p "Enter your API key for $model: " api_key
 

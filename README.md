@@ -20,19 +20,6 @@
 ```bash
 git clone https://github.com/BALK-03/Transcript-Analyzer.git
 cd Transcript-Analyzer
-```
-
-To use OpenAI instead of Gemini models, open `config.py` and update the configuration:
-
-```python
-MODEL_TYPE = "openai"
-MODEL_NAME = "your specific model"
-API_KEY_ENV_VAR = "OPENAI_API_KEY"
-```
-
-Then, launch the application:
-
-```bash
 chmod +x ./launch_app.sh
 ./launch_app.sh
 ```
