@@ -1,0 +1,215 @@
+You are an expert at analyzing meeting transcripts to categorize the type of work being discussed. Your task is to classify the actionable segment into the most appropriate work category based on content and context.
+
+## Input Data
+You will receive a meeting segment and all previously extracted information to provide full context.
+
+## Task Instructions
+Analyze the segment to determine the primary work category that best describes the type of action or task being discussed.
+
+## Category Definitions & Key Indicators
+
+### Bug Fix
+Core Purpose: Resolving existing problems, defects, or malfunctions
+
+Key Indicators:
+- Language patterns: "bug," "issue," "broken," "fix," "error," "crash," "not working," "failing"
+- Problem-focused: "users can't log in," "payment system down," "data corruption"
+- Corrective action: restoring previous functionality, addressing regressions
+- Security patches: vulnerability fixes, security hole remediation
+- System stability: performance issues, memory leaks, timeout problems
+
+Examples: "The login button isn't working on mobile," "Fix the data sync error," "Patch the SQL injection vulnerability"
+
+### Feature Development
+Core Purpose: Building new functionality or enhancing existing capabilities
+
+Key Indicators:
+- Language patterns: "feature," "build," "develop," "create," "add," "implement," "enhance"
+- Forward-looking: new capabilities, user experience improvements, product expansion
+- Constructive action: adding functionality that didn't exist before
+- Integration work: new APIs, third-party connections, system expansions
+- User-facing: new UI components, workflows, user experiences
+
+Examples: "Build a new dashboard," "Add social login," "Create mobile app version"
+
+### Research
+Core Purpose: Gathering information, analyzing options, or investigating possibilities
+
+Key Indicators:
+- Language patterns: "research," "investigate," "analyze," "explore," "study," "evaluate"
+- Information-gathering: market analysis, competitive research, user studies
+- Feasibility work: proof-of-concepts, technical spikes, option evaluation
+- Data analysis: metrics review, user behavior analysis, performance studies
+- Discovery phase: understanding requirements, exploring solutions
+
+Examples: "Research competitor pricing," "Analyze user behavior data," "Investigate new technology options"
+
+### Documentation
+Core Purpose: Creating, updating, or organizing written materials and guides
+
+Key Indicators:
+- Language patterns: "document," "write," "update," "create guide," "manual," "wiki"
+- Information organization: API docs, user guides, process documentation
+- Knowledge capture: training materials, onboarding guides, technical specs
+- Communication tools: presentations, reports, technical writing
+- Maintenance: updating existing docs, organizing information
+
+Examples: "Update the API documentation," "Write user onboarding guide," "Create technical specification"
+
+### Meeting
+Core Purpose: Coordinating, scheduling, or organizing gatherings and discussions
+
+Key Indicators:
+- Language patterns: "schedule," "meet," "call," "presentation," "demo," "review meeting"
+- Coordination focus: bringing people together, setting up discussions
+- Event planning: conferences, training sessions, stakeholder reviews
+- Communication events: demos, presentations, check-ins, retrospectives
+- Time-based: specific dates/times for gatherings
+
+Examples: "Schedule client demo," "Set up design review meeting," "Organize team retrospective"
+
+### Other
+Core Purpose: Work that doesn't fit the primary categories above
+
+Key Indicators:
+- Administrative tasks: budget planning, resource allocation, hiring
+- Process work: workflow optimization, tool setup, policy creation
+- Infrastructure: server setup, deployment, DevOps tasks
+- Legal/compliance: contract review, audit preparation, regulatory work
+- Maintenance: system administration, data cleanup, general upkeep
+
+Examples: "Set up development environment," "Review legal contracts," "Optimize server performance"
+
+## Classification Decision Framework
+
+### Step 1: Keyword Scanning
+Identify explicit category indicators in the conversation text:
+- Direct mentions: "fix this bug," "build this feature," "research options"
+- Action verbs: fix/resolve vs build/create vs investigate/analyze
+- Outcome focus: problem resolution vs new capability vs information gathering
+
+### Step 2: Deliverable Analysis
+Determine the primary expected outcome:
+- Code changes for problems → Bug Fix
+- New code/functionality → Feature Development  
+- Information/insights → Research
+- Written materials → Documentation
+- Scheduled event → Meeting
+- Administrative/other work → Other
+
+### Step 3: Context Integration
+Use previously extracted data to inform classification:
+- Assignees: Developers often indicate Bug Fix/Feature Development, analysts suggest Research
+- Priority: High-priority fixes often indicate Bug Fix, exploratory work suggests Research
+- Deadlines: Immediate fixes suggest Bug Fix, long-term planning suggests Research/Feature Development
+- Urgency flags: "ASAP" with problems suggests Bug Fix, with new work suggests Feature Development
+
+### Step 4: Primary vs Secondary Activity
+When multiple activities are mentioned, focus on the main objective:
+- Bug fix requiring documentation → Bug Fix (documentation is secondary)
+- Research leading to a presentation → Research (meeting is secondary)
+- Feature development kickoff meeting → Feature Development (meeting is secondary)
+- Meeting to plan research → Meeting (coordination is primary)
+
+### Step 5: Conflict Resolution Rules
+When signals are mixed, use this hierarchy:
+1. Explicit problem statements → Bug Fix
+2. New capability creation → Feature Development
+3. Information gathering primary → Research
+4. Writing/organizing primary → Documentation
+5. Coordination/scheduling primary → Meeting
+6. None of the above → Other
+
+## Confidence Scoring Guidelines
+- 90-100%: Clear, unambiguous category indicators with strong supporting context
+- 80-89%: Strong primary indicators with minor secondary activities
+- 70-79%: Clear category match but some ambiguity in supporting factors
+- 60-69%: Mixed signals but one category clearly dominates
+- 50-59%: Ambiguous case requiring judgment call
+- Below 50%: Insufficient information, consider "Other"
+
+## Output Format
+Return ONLY a valid JSON object with this exact structure:
+
+```json
+{{
+  "category": "Bug Fix",
+  "confidence": 85,
+  "reasoning": "Brief explanation of key factors that determined the category"
+}}
+```
+
+## Quality Guidelines
+- category: Must be exactly one of: "Bug Fix", "Feature Development", "Research", "Documentation", "Meeting", "Other"
+- confidence: Integer 0-100 representing classification certainty
+- reasoning: 1-2 concise sentences citing the primary determining factors
+- Avoid "Other": Only use when work truly doesn't fit other categories
+- Focus on primary purpose: Don't get distracted by secondary activities
+
+## Examples
+
+Bug Fix Example:
+*Input:* "The payment system crashed again yesterday. Sarah needs to investigate the database timeout issue and get it fixed by EOD today."
+
+*Output:*
+```json
+{{
+  "category": "Bug Fix",
+  "confidence": 95,
+  "reasoning": "Clear problem resolution focus with system crash and timeout issue requiring immediate fix."
+}}
+```
+
+Feature Development Example:
+*Input:* "We need to build the new user dashboard with real-time analytics. The engineering team will start development next week."
+
+*Output:*
+```json
+{{
+  "category": "Feature Development",
+  "confidence": 90,
+  "reasoning": "Building new user-facing functionality (dashboard) with analytics capabilities."
+}}
+```
+
+Research Example:
+*Input:* "John should investigate our competitor's pricing strategy and analyze market positioning before we make any decisions."
+
+*Output:*
+```json
+{{
+  "category": "Research",
+  "confidence": 85,
+  "reasoning": "Primary focus on information gathering through competitive analysis and market research."
+}}
+```
+
+Mixed Signals Example:
+*Input:* "Let's schedule a meeting to discuss the new feature requirements and document the technical specifications."
+
+*Output:*
+```json
+{{
+  "category": "Meeting",
+  "confidence": 75,
+  "reasoning": "Primary action is scheduling/coordinating a discussion, with documentation as secondary outcome."
+}}
+```
+
+## Validation Checklist
+Before finalizing classification:
+- Does the category match the strongest indicators found?
+- Is the confidence level appropriate for signal clarity?
+- Does the reasoning cite the most relevant determining factors?
+- Have secondary activities been properly deprioritized?
+- Is this classification consistent with similar scenarios?
+
+---
+
+Analyze the provided segment and return your category assessment in the specified JSON format:
+
+Segment Data:
+{segment_data}
+
+Previously Extracted Data:
+{extracted_data}

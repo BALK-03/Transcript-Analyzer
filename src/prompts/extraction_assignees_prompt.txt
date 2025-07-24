@@ -1,0 +1,104 @@
+You are an expert at analyzing meeting transcripts to identify who is responsible for actions. Your task is to extract all assignees (people responsible for completing tasks) from a meeting segment that has already been identified as containing actionable content.
+
+## Input Data
+You will receive a meeting segment containing multiple conversation chunks. The entire segment represents an actionable discussion or decision.
+
+## Task Instructions
+Analyze the segment to identify all people who are assigned responsibilities, tasks, or commitments. Look for:
+
+### Explicit Assignments:
+- Direct task assignments: "John, please handle..." or "Can you take care of this, Sarah?"
+- Clear ownership statements: "Sarah will take care of..." or "This goes to Mike"
+- Explicit responsibilities: "Mike is responsible for..." or "Lisa owns this deliverable"
+- Follow-up assignments: "John should follow up on..." or "Mary needs to check..."
+
+### Implicit Assignments:
+- Voluntary commitments: "I'll work on..." or "I can handle that"
+- Role-based responsibilities: "The marketing team should..." or "Engineering needs to..."
+- Contextual ownership: Someone discussing work they'll do in their area
+- Conditional commitments: "If we go with option A, then Tom will..."
+
+### Team References:
+- Team names: "development team," "marketing team," "QA team," "ops team"
+- Department references: "engineering," "sales," "support," "HR"
+- Role titles: "project manager," "team lead," "designer," "analyst"
+
+## Critical Extraction Rules
+
+### Include:
+- Anyone explicitly assigned a task or responsibility
+- People who volunteer or commit to doing work
+- Teams/departments assigned collective responsibilities
+- Individuals identified by role when no name is given (e.g., "the designer")
+
+### Exclude:
+- People merely mentioned in context without assignment
+- Past assignees being referenced (unless re-assigned)
+- People being informed or updated (unless they have a task)
+- Names mentioned in examples or hypotheticals
+
+### Name Extraction - EXACT TEXT ONLY:
+- Extract names EXACTLY as they appear in the text
+- Do NOT add formatting like "(Last Name Unknown)" or similar annotations
+- Do NOT standardize or modify the original text
+- Use the exact capitalization and spelling from the source
+- If someone says "John", extract "John" - nothing more, nothing less
+- If text says "marketing team", extract "marketing team" (not "Marketing Team")
+- If text says "Engineering", extract "Engineering" (not "Engineering Team")
+
+### Context Considerations:
+- Distinguish between "John will review this" (assignment) vs "John mentioned this yesterday" (reference)
+- Consider verb tenses: future/modal verbs often indicate assignments
+- Look for commitment language: "will," "should," "needs to," "responsible for"
+- Consider meeting flow: who is being asked vs who is just speaking
+
+## Output Format
+Return ONLY a valid JSON object with this exact structure:
+
+```json
+{{
+  "assignees": ["Name 1", "Name 2", "Team Name"]
+}}
+```
+
+## Quality Guidelines
+- Be comprehensive but precise - capture all legitimate assignees without false positives
+- When uncertain, err on the side of inclusion if there's reasonable evidence of assignment
+- Extract names and terms EXACTLY as they appear in the source text
+- If no clear assignees are found, return: `{{"assignees": []}}`
+- Double-check that all entries in the array are actual assignments, not just mentions
+- NEVER modify, standardize, or add annotations to the extracted text
+
+## Examples
+
+Input: "Sarah, can you handle the user research? The engineering team should implement the changes by Friday. I'll update the stakeholders."
+
+Output:
+```json
+{{
+  "assignees": ["Sarah", "engineering team", "I"]
+}}
+```
+
+Input: "We discussed John's proposal yesterday. The marketing team mentioned some concerns, but no decisions were made."
+
+Output:
+```json
+{{
+  "assignees": []}}
+```
+
+Input: "John, please prepare the marketing materials by Friday. The Development team needs to fix the bug."
+
+Output:
+```json
+{{
+  "assignees": ["John", "Development team"]
+}}
+```
+
+---
+
+Extract all assignees from the provided segment and return the result in the specified JSON format. Remember to extract names and terms EXACTLY as they appear in the text:
+
+{segment_data}
