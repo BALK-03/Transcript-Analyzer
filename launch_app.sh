@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -e
+set -e  # Exit immediately on error
 
 CONFIG_DIR="config"
 ENV_FILE="$CONFIG_DIR/.env"
+MODELS=("gemini" "openai")
 
-MODELS=("gemini"  "openai")
-
+# Ask user to select AI model
 echo "Select the AI model you want to use:"
 select model in "${MODELS[@]}"; do
     if [[ -n "$model" ]]; then
@@ -17,44 +17,54 @@ select model in "${MODELS[@]}"; do
     fi
 done
 
+# Prompt for API key
 read -p "Enter your API key for $model: " api_key
 
-if [$model -eq "gemini"]; then
-cat > "$ENV_FILE" <<EOF
+# Create config directory if it doesn't exist
+mkdir -p "$CONFIG_DIR"
+
+# Write to .env file based on selected model
+if [[ "$model" == "gemini" ]]; then
+    cat > "$ENV_FILE" <<EOF
 GEMINI_API_KEY=$api_key
 EOF
-elif [$model -eq "openai"]; then
-cat > "$ENV_FILE" <<EOF
-GEMINI_API_KEY=$api_key
+elif [[ "$model" == "openai" ]]; then
+    cat > "$ENV_FILE" <<EOF
+OPENAI_API_KEY=$api_key
 EOF
 fi
 
-echo "Created .env file at $ENV_FILE"
+echo "✅ Created .env file at $ENV_FILE"
 
-echo "Downloading uv for linux users, if not a linux go to uv docs and download"
-if [linux]; then
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install uv (if not already installed)
+if ! command -v uv &> /dev/null; then
+    echo "🔧 Downloading uv for Linux users (skip if you have it)..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+else
+    echo "✅ uv is already installed."
 fi
 
-echo "Creating virtual environment with uv..."
-uv venv create --prompt myenv
-source .venv/myenv/bin/activate
+# Create virtual environment
+echo "🐍 Creating virtual environment with uv..."
+uv venv .venv
+source .venv/bin/activate
 
-echo "Installing dependencies from pyproject.toml..."
+# Install project dependencies
+echo "📦 Installing dependencies from pyproject.toml..."
 uv sync
 
-echo "Starting FastAPI server (main.py)..."
+# Run FastAPI server in background
+echo "🚀 Starting FastAPI server (main.py)..."
+mkdir -p logs
 nohup python3 main.py > logs/fastapi.log 2>&1 &
 
-echo "Starting Gradio UI (gradio_ui.py)..."
+# Run Gradio UI
+echo "🎨 Starting Gradio UI (gradio_ui.py)..."
 python3 gradio_ui.py &
 
 sleep 3
 
+# Final message
 echo ""
-echo "Application should be running..."
-echo "Gradio UI URL will be printed below when ready..."
-
-echo "Open your browser and visit http://127.0.0.1:7860 to test the UI!"
-
-wait
+echo "✅ Application is running!"
+echo "🔗 Visit the Gradio UI at: http://127.0.0.1:7861"
