@@ -41,4 +41,5 @@ with gr.Blocks() as demo:
         outputs=output
     )
 
-demo.launch(server_name="127.0.0.1", server_port=7861)
+if __name__ == "__main__":
+    demo.launch()
