@@ -5,14 +5,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 
 from src.models.base_model import BaseAIModel
 from src.models.gemini_model import GeminiAIModel
-from src.models.ollama_model import OllamaAIModel
+from src.models.openai_model import OpenAIAIModel
 
 class AIModelFactory:
     """Factory to create AI models"""
 
     _models = {
         "gemini": GeminiAIModel,
-        "ollama": OllamaAIModel,
+        "openai": OpenAIAIModel,
     }
 
     @classmethod
