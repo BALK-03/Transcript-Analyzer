@@ -1,13 +1,10 @@
 **An AI-powered tool to extract and prioritize action items from meeting transcripts using advanced natural language processing techniques.**
 
----
 
 ## Table of Contents
 
 - [Quick Start](#quick-start)
-- [System Architecture](#system-architecture)
-   - [Initial Design](#initial-design)
-   - [Implemented Design](#implemented-design)
+- [System Design](#system-design)
 - [Design Justifications](#design-justifications)
   - [Design Patterns](#design-patterns)
   - [Modular Design](#modular-design)
@@ -17,28 +14,52 @@
 
 ## Quick Start
 
+#### Clone the Repository
 ```bash
 git clone https://github.com/BALK-03/Transcript-Analyzer.git
 cd Transcript-Analyzer
+```
+
+#### Use OpenAI Model (Optional)
+
+If you want to use an **OpenAI model** for processing:
+
+* Open `config.py` and update the model configuration:
+
+```python
+MODEL_TYPE = "openai"
+MODEL_NAME = "gpt-4o"  # Or any other OpenAI model
+API_KEY_ENV_VAR = "OPENAI_API_KEY"
+```
+
+#### Create a .env file
+* Create a `.env` file inside the `config/` directory and add your API key.
+
+  You can use `config/.env_template` as a reference.
+
+
+#### Launch the app
+
+```bash
 chmod +x ./launch_app.sh
 ./launch_app.sh
 ```
 
-After launching, visit the local UI URL shown in your terminal to access the Gradio interface.
+Once running, check your terminal for the **local Gradio UI URL** and open it in your browser.
 
-To clean up resources after use:
+#### Clean Up After Use
 
 ```bash
 ./cleanup.sh
 ```
 
-**Note:** On non-Linux systems, adjust the commands accordingly.
+
+> **Note:** If you're on macOS or Windows, adjust file permissions or scripts as needed.
+
 
 ---
 
-## System Architecture
-
-### Initial Design
+## System Design
 
 1. **Chunking:**
    Raw transcripts are divided into ordered chunks to address the limited context window of large language models.
@@ -53,21 +74,12 @@ To clean up resources after use:
    Relevant action items are extracted using prompt-based reasoning (CoT) to improve reliability and reduce hallucinations.
 
 5. **Quality Check & Validation:**
-   Basic validation ensures action items are realistic—e.g., checking if deadlines are plausible and assignees match actual meeting participants.
-
+   Basic validation ensures that action items are realistic, for example, by checking whether deadlines are plausible and whether assignees match actual meeting participants. Given the timeline, this step has not been implemented.
+   
 <p align="center">
-  <img src="docs/InitialDesign.png" alt="Initial Design" width="500"/>
+  <img src="docs/InitialDesign.png" alt="Initial Design" width="600"/>
 </p>
 
-### Implemented Design
-
-Due to time constraints, not all optimizations were implemented. The focus was on building a fully functional end-to-end system that could be iterated on later for performance and efficiency improvements.
-
-<p align="center">
-  <img src="docs/solution.png" alt="Implemented Design" width="500"/>
-</p>
-
----
 
 ## Design Justifications
 
