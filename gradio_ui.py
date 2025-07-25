@@ -1,7 +1,8 @@
 import gradio as gr
 import requests
+from config import Config
 
-API_URL = "http://127.0.0.1:8000/pipeline"
+API_URL = Config.FASTAPI_API_URL
 
 def call_pipeline_api(text_input, file):
     # If file uploaded, read its content; else use text_input
@@ -12,12 +13,21 @@ def call_pipeline_api(text_input, file):
         transcript = text_input
     
     payload = {"transcript": transcript}
-    response = requests.post(API_URL, json=payload)
+
+    try:
+        response = requests.post(API_URL, json=payload)
+        print("Response status:", response.status_code)
+
+        if response.status_code == 200:
+            try:
+                return response.json()  # Expecting JSON (dict or list)
+            except Exception as e:
+                return {"error": f"Invalid JSON returned: {str(e)}", "raw_response": response.text}
+        else:
+            return {"error": f"HTTP {response.status_code}", "raw_response": response.text}
     
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return f"Error: {response.status_code} - {response.text}"
+    except Exception as e:
+        return {"error": f"Request failed: {str(e)}"}
 
 with gr.Blocks() as demo:
     gr.Markdown("## Transcript Action Item Extractor")
