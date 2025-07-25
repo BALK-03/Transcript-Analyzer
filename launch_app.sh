@@ -3,7 +3,10 @@ set -e
 
 # --- 1. Check and install uv if needed ---
 OS_TYPE=$(uname -s)
-if ! command -v uv &> /dev/null; then
+
+if command -v uv &> /dev/null; then
+    echo "uv is already installed."
+else
     if [[ "$OS_TYPE" == "Linux" || "$OS_TYPE" == "Darwin" ]]; then
         echo "uv not found. Installing for $OS_TYPE..."
         curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -13,9 +16,8 @@ if ! command -v uv &> /dev/null; then
         echo "Please install it manually from: https://docs.astral.sh/uv/"
         exit 1
     fi
-else
-    echo "uv is already installed."
 fi
+
 
 # --- 2. Dependency Setup ---
 spinner() {
