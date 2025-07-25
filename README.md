@@ -33,9 +33,8 @@ API_KEY_ENV_VAR = "OPENAI_API_KEY"
 ```
 
 #### Create a .env file
-* Create a `.env` file inside the `config/` directory and add your API key.
-
-  You can use `config/.env_template` as a reference.
+Create a `.env` file inside the `config/` directory and add your API key.
+You can use `config/.env_template` as a reference.
 
 
 #### Launch the app
@@ -77,7 +76,7 @@ Once running, check your terminal for the **local Gradio UI URL** and open it in
    Basic validation ensures that action items are realistic, for example, by checking whether deadlines are plausible and whether assignees match actual meeting participants. Given the timeline, this step has not been implemented.
    
 <p align="center">
-  <img src="docs/InitialDesign.png" alt="Initial Design" width="600"/>
+  <img src="docs/InitialDesign.png" alt="Initial Design" width="750"/>
 </p>
 
 
