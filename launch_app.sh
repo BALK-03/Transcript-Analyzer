@@ -97,7 +97,7 @@ EOF
 echo ""
 echo "Application is running!"
 echo "FastAPI Server: http://127.0.0.1:8000"
-echo "Gradio UI:      http://127.0.0.1:$GRADIO_PORT"
+echo ">>>> GO TO, Gradio UI:      http://127.0.0.1:$GRADIO_PORT"
 echo ""
 echo "PIDs saved to $PID_FILE for cleanup:"
 echo "FastAPI PID: $fastapi_pid"
