@@ -3,12 +3,75 @@
 
 ## Table of Contents
 
+- [Project Structure](#project-structure)
 - [Quick Start](#quick-start)
 - [System Design](#system-design)
 - [Design Justifications](#design-justifications)
   - [Design Patterns](#design-patterns)
   - [Modular Design](#modular-design)
 - [Future Improvements](#future-improvements)
+
+---
+### Project Structure
+```bash
+├── api                         # FastAPI interface layer for routing and request handling
+│   ├── models.py               # Pydantic models for request/response schemas
+│   └── routes/
+│       └── pipeline.py         # Route definition for triggering the transcript processing pipeline
+│
+├── config/                     # Environment and configuration-related files
+│   └── .env_template           # Template for required environment variables (API keys, settings, etc.)
+│
+├── data/                       # Sample data for testing and development
+│   └── transcript.txt          # Sample input transcript used for local testing
+│
+├── docs/                       # Visual documentation and architecture diagrams
+│   ├── InitialDesign.png       # Initial architecture sketch
+│   └── solution.png            # Final implementation diagram
+│
+├── logs/                       # Directory for storing runtime and debug logs
+│
+├── src/                        # Core logic: AI models, services, prompts, utils
+│   ├── models/
+│   │   ├── base_model.py       # Base interface for all AI model wrappers
+│   │   ├── gemini_model.py     # Gemini (Google) model implementation
+│   │   ├── model_factory.py    # Factory pattern to select correct model
+│   │   └── openai_model.py     # OpenAI model implementation
+│   │
+│   ├── prompts/                # Prompt templates used for LLM calls
+│   │   ├── clustering_service_prompt.txt
+│   │   ├── extraction_assignees_prompt.txt
+│   │   ├── extraction_category_prompt.txt
+│   │   ├── extraction_deadlines_prompt.txt
+│   │   ├── extraction_priority_prompt.txt
+│   │   └── filtering_service_prompt.txt
+│   │
+│   ├── services/
+│   │   ├── chunking_service.py
+│   │   ├── clustering_service.py
+│   │   ├── extraction/
+│   │   │   ├── assignee_extractor.py
+│   │   │   ├── base_extractor.py
+│   │   │   ├── category_extractor.py
+│   │   │   ├── deadlines_extractor.py
+│   │   │   └── priority_extractor.py
+│   │   ├── extraction_service.py
+│   │   ├── filtering_service.py
+│   │   └── pipeline_service.py
+│   │
+│   └── utils/                  # General utility functions (I/O, formatting, etc.)
+│
+├── .gitignore                  # Git ignored files (e.g., .env, __pycache__, logs)
+├── .python-version             # Python version declaration for environment managers (e.g., pyenv)
+├── README.md                   # Main documentation file with usage instructions and structure
+├── config.py                   # Loads and validates global settings and env variables
+├── fastapi_app.py              # Main entrypoint for FastAPI server
+├── gradio_ui.py                # Optional interactive Gradio frontend
+├── launch_app.sh               # Bash launcher with dynamic model config (handles Windows issues)
+├── paths.py                    # Path management helper (standardizes all file/folder references)
+├── pyproject.toml              # Project and dependency config (used with `uv`)
+└── uv.lock                     # Lockfile for deterministic dependency installation
+```
 
 ---
 
