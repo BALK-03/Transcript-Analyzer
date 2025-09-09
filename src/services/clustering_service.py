@@ -1,12 +1,8 @@
-import os, sys
 import re
 import json
 from typing import Optional, Any
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.models.base_model import BaseAIModel
-import paths
-
+from config import paths
 
 class ClusteringService:
     def __init__(self):
@@ -87,43 +83,3 @@ class ClusteringService:
             return enriched
         except Exception as e:
             raise Exception("Problem occurred while prompting the model.") from e
-
-
-
-if __name__ == "__main__":
-    import os, sys
-    from dotenv import load_dotenv
-
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    from src.models.model_factory import AIModelFactory
-    import paths
-
-    load_dotenv(paths.ENV_FILE)
-
-    example_chunks = [
-        {"id": 0, "order": 0, "content": "Alice: Let's start by reviewing last quarter's performance."},
-        {"id": 1, "order": 1, "content": "Bob: Yes, the sales numbers were lower than expected."},
-        {"id": 2, "order": 2, "content": "Alice: We also need to plan for next month's product launch."},
-        {"id": 3, "order": 3, "content": "Charlie: The marketing team is already preparing campaign ideas."}
-    ]
-
-    factory = AIModelFactory()
-    model = factory.create_model(
-        model_type="gemini",
-        config={
-            "api_key": os.getenv("GEMINI_API_KEY"),
-            "model": "gemini-2.0-flash",
-            "max_retries": 5,
-            "base_delay": 1.0,
-            "max_delay": 8.0
-        }
-    )
-
-    clustering_service = ClusteringService()
-
-    try:
-        response = clustering_service.chunks_to_segments(example_chunks, model)
-        print("Enriched Segmented Response:\n")
-        print(response)
-    except Exception as e:
-        print(f"Error during segmentation: {e}")

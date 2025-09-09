@@ -1,16 +1,11 @@
+from typing import Any
+import os, time, random
 import google.generativeai as genai
 from google.api_core.exceptions import ResourceExhausted, InternalServerError, ServiceUnavailable
-import random
-import time
-from typing import Any
-import os, sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.models.base_model import BaseAIModel
+from src.models.model_factory import AIModelFactory
 
 
-# TODO:
-#   - For default config values, use config files, for better code changing later
 class GeminiAIModel(BaseAIModel):
     def __init__(self, config: dict[str, Any] = None):
         super().__init__(config)
@@ -63,36 +58,7 @@ class GeminiAIModel(BaseAIModel):
             "model": self.model_name,
             "description": "Gemini model via Google Generative AI API"
         }
-    
-
-if __name__ == "__main__":
-    import os, sys
-    from dotenv import load_dotenv
-
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    import paths
-
-    load_dotenv(paths.ENV_FILE)
-
-    # Example config (replace with your actual API key or set GEMINI_API_KEY in env)
-    config = {
-        "api_key": os.getenv("GEMINI_API_KEY"),
-        "model": "gemini-2.0-flash",
-        "max_retries": 5,
-        "base_delay": 1.0,
-        "max_delay": 8.0
-    }
-
-    # Instantiate the model
-    model = GeminiAIModel(config)
 
 
-    prompt = "Explain Machine Learning in 10 words."
-
-    print(f"Prompt:\n{prompt}\n{'-' * 40}")
-
-    try:
-        output = model.process(prompt)
-        print("Response:\n", output)
-    except Exception as e:
-        print("Failed to get response:", e)
+# Dynamic Registration for this class to follow the Open-Closed Principle
+AIModelFactory.register_model("gemini", GeminiAIModel)

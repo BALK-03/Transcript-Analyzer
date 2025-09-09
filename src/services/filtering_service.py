@@ -1,12 +1,8 @@
-import os, sys
 import re
 import json
 from typing import Optional, Any
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.models.base_model import BaseAIModel
-import paths
-
+from config import paths
 
 class FilteringService:
     def __init__(self):
@@ -163,77 +159,3 @@ class FilteringService:
             List containing only segments where action_segments_found == "yes"
         """
         return self.get_actionable_segments_only(segments, model)
-
-
-if __name__ == "__main__":
-    import os, sys
-    from dotenv import load_dotenv
-
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    from src.models.model_factory import AIModelFactory
-    import paths
-
-    load_dotenv(paths.ENV_FILE)
-
-    # Example output from ClusteringService
-    example_segments = [
-        {
-            'segment_id': 1, 
-            'topic_summary': "Reviewing last quarter's performance and discussing sales numbers.", 
-            'chunks': [
-                {'id': 0, 'order': 0, 'content': "Alice: Let's start by reviewing last quarter's performance."}, 
-                {'id': 1, 'order': 1, 'content': 'Bob: Yes, the sales numbers were lower than expected.'}
-            ]
-        }, 
-        {
-            'segment_id': 2, 
-            'topic_summary': "Planning for next month's product launch and marketing campaign preparation.", 
-            'chunks': [
-                {'id': 2, 'order': 2, 'content': "Alice: We also need to plan for next month's product launch."}, 
-                {'id': 3, 'order': 3, 'content': 'Charlie: The marketing team is already preparing campaign ideas.'}
-            ]
-        }
-    ]
-
-    factory = AIModelFactory()
-    model = factory.create_model(
-        model_type="gemini",
-        config={
-            "api_key": os.getenv("GEMINI_API_KEY"),
-            "model": "gemini-2.0-flash",
-            "max_retries": 5,
-            "base_delay": 1.0,
-            "max_delay": 8.0
-        }
-    )
-
-    filtering_service = FilteringService()
-
-    try:
-        # Analyze all segments for actions
-        analyzed_segments = filtering_service.filter_segments_for_actions(example_segments, model)
-        print("All Segments with Action Analysis:\n")
-        for segment in analyzed_segments:
-            print(f"Segment {segment['segment_id']}:")
-            print(f"  Topic: {segment['topic_summary']}")
-            print(f"  Actions Found: {segment['action_analysis']['action_segments_found']}")
-            print(f"  Confidence: {segment['action_analysis']['confidence_percentage']}%")
-            print(f"  Explanation: {segment['action_analysis']['explanation']}")
-            print()
-
-        # Get only actionable segments (using the main filtering function)
-        actionable_segments = filtering_service.filter_for_actionable_segments(example_segments, model)
-        print(f"\nFinal Output - Actionable Segments Only ({len(actionable_segments)} found):\n")
-        for segment in actionable_segments:
-            print(f"Segment {segment['segment_id']}: {segment['topic_summary']}")
-            print(f"  Confidence: {segment['action_analysis']['confidence_percentage']}%")
-            print(f"  Explanation: {segment['action_analysis']['explanation']}")
-            print()
-
-        # Alternative: Get only actionable segments (legacy method)
-        actionable_segments_alt = filtering_service.get_actionable_segments_only(example_segments, model)
-        print(f"\nAlternative Method - Same Result ({len(actionable_segments_alt)} found)")
-        print("(Both methods return identical results)\n")
-
-    except Exception as e:
-        print(f"Error during filtering: {e}")

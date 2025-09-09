@@ -1,15 +1,11 @@
-import os, sys
 from typing import Any
-from pathlib import Path
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
 from src.services.chunking_service import ChunkingService
 from src.services.clustering_service import ClusteringService
 from src.services.filtering_service import FilteringService
 from src.services.extraction_service import ExtractionService
 from src.models.model_factory import AIModelFactory
-from config import get_config
+import src.models.register_all_models # Important to register models
+from config.config import get_config
 
 def run_pipeline(transcript_input: str, debug: bool = None) -> dict[str, Any]:
     """
@@ -38,8 +34,7 @@ def run_pipeline(transcript_input: str, debug: bool = None) -> dict[str, Any]:
     chunker = ChunkingService()
     chunks = chunker.transcript_to_chunks(
         transcript,
-        start_marker=config.CHUNK_START_MARKER,
-        end_marker=config.CHUNK_END_MARKER
+        chunk_size=config.CHUNK_SIZE
     )
     if debug:
         print(f"Chunked {len(chunks)} utterances.")
@@ -66,18 +61,3 @@ def run_pipeline(transcript_input: str, debug: bool = None) -> dict[str, Any]:
     summary = extraction_service.get_structured_action_summary(actionable_segments, model, debug=debug)
 
     return summary
-
-if __name__ == "__main__":
-    import paths
-    from dotenv import load_dotenv
-    from pprint import pprint
-
-    load_dotenv(paths.ENV_FILE)
-    
-    config = get_config()
-    
-    summary = run_pipeline(
-        transcript_input=config.DEFAULT_TRANSCRIPT_FILE,
-        debug=config.DEBUG_MODE
-    )
-    pprint(summary)

@@ -1,14 +1,10 @@
-import os, sys
 from typing import Any
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.services.extraction.assignee_extractor import AssigneesExtractor
 from src.services.extraction.deadlines_extractor import DeadlinesExtractor
 from src.services.extraction.priority_extractor import PriorityExtractor
 from src.services.extraction.category_extractor import CategoryExtractor
 from src.models.base_model import BaseAIModel
-import paths
-
 
 class ExtractionService:
     """
@@ -162,73 +158,3 @@ class ExtractionService:
                 summary["actions"].append(segment)
         
         return summary
-
-
-if __name__ == "__main__":
-    import os, sys
-    from dotenv import load_dotenv
-    from pprint import pprint
-
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    from src.models.model_factory import AIModelFactory
-    import paths
-
-    load_dotenv(paths.ENV_FILE)
-
-    # Example output from FilteringService (actionable segments only)
-    example_actionable_segments = [
-        {
-            'segment_id': 2, 
-            'topic_summary': "Planning for next month's product launch and marketing campaign preparation.", 
-            'chunks': [
-                {'id': 2, 'order': 2, 'content': "Alice: We need to plan for next month's product launch. John, can you prepare the marketing materials by Friday?"}, 
-                {'id': 3, 'order': 3, 'content': 'Charlie: The marketing team is already preparing campaign ideas. I will have the first draft ready by Wednesday.'},
-                {'id': 4, 'order': 4, 'content': 'Alice: Great! Sarah, please coordinate with the development team for the final testing phase.'}
-            ],
-            'action_analysis': {
-                'action_segments_found': 'yes',
-                'confidence_percentage': 95,
-                'explanation': 'Multiple specific tasks assigned with deadlines and responsibilities.'
-            }
-        }
-    ]
-
-    factory = AIModelFactory()
-    model = factory.create_model(
-        model_type="gemini",
-        config={
-            "api_key": os.getenv("GEMINI_API_KEY"),
-            "model": "gemini-2.0-flash",
-            "max_retries": 5,
-            "base_delay": 1.0,
-            "max_delay": 8.0
-        }
-    )
-
-    extraction_service = ExtractionService()
-
-    try:
-        # Extract actions from segments using chain of prompts (with debug enabled)
-        # extracted_segments = extraction_service.extract_from_segments(example_actionable_segments, model, debug=True)
-        # print("\n" + "="*50)
-        # print("EXTRACTED ACTIONS (CLEAN FORMAT):")
-        # print("="*50)
-        
-        # for action in extracted_segments:
-        #     print(f"\nTask: {action['task']}")
-        #     print(f"Assignee: {action['assignee']}")
-        #     print(f"Deadline: {action['deadline']}")
-        #     print(f"Priority Level: {action['priority_level']}")
-        #     print(f"Category: {action['category']}")
-
-        # # Get structured summary
-        # print("\n" + "="*50)
-        # print("STRUCTURED SUMMARY:")
-        # print("="*50)
-        summary = extraction_service.get_structured_action_summary(example_actionable_segments, model, debug=False)
-        pprint(summary)
-
-    except Exception as e:
-        print(f"Error during extraction: {e}")
-        import traceback
-        traceback.print_exc()

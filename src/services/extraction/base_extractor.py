@@ -1,12 +1,8 @@
-import os, sys
-from abc import ABC, abstractmethod
 import re
-from typing import Any, Optional
 import json
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+from typing import Any, Optional
+from abc import ABC, abstractmethod
 from src.models.base_model import BaseAIModel
-
 
 class BaseExtractor(ABC):
     """Base class for all extractors with common functionality."""

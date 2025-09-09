@@ -1,10 +1,7 @@
-import os, sys
 from typing import Any
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 from src.services.extraction.base_extractor import BaseExtractor
 from src.models.base_model import BaseAIModel
-import paths
+from config import paths
 
 class PriorityExtractor(BaseExtractor):
     """Handles extraction of priority from segments."""

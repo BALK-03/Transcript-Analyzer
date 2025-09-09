@@ -1,12 +1,8 @@
-import openai
-from openai import OpenAIError, RateLimitError, APIError
-import random
-import time
 from typing import Any
-import os, sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+import os, time, openai, random
+from openai import OpenAIError, RateLimitError, APIError
 from src.models.base_model import BaseAIModel
+from src.models.model_factory import AIModelFactory
 
 
 class OpenAIAIModel(BaseAIModel):
@@ -65,28 +61,5 @@ class OpenAIAIModel(BaseAIModel):
         }
 
 
-if __name__ == "__main__":
-    from dotenv import load_dotenv
-    import paths
-
-    load_dotenv(paths.ENV_FILE)
-
-    config = {
-        "api_key": os.getenv("OPENAI_API_KEY"),
-        "model": "gpt-4o",
-        "max_retries": 5,
-        "base_delay": 1.0,
-        "max_delay": 8.0,
-    }
-
-    model = OpenAIAIModel(config)
-
-    prompt = "Explain Machine Learning in 10 words."
-
-    print(f"Prompt:\n{prompt}\n{'-' * 40}")
-
-    try:
-        output = model.process(prompt)
-        print("Response:\n", output)
-    except Exception as e:
-        print("Failed to get response:", e)
+# Dynamic Registration for this class to follow the Open-Closed Principle
+AIModelFactory.register_model("openai", OpenAIAIModel)

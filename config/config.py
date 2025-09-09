@@ -11,8 +11,7 @@ class Config:
     DEFAULT_TRANSCRIPT_FILE = 'data/transcript.txt'
     
     # Chunking service
-    CHUNK_START_MARKER = "TRANSCRIPT:"
-    CHUNK_END_MARKER = "[END TRANSCRIPT"
+    CHUNK_SIZE = 3
     
     # AI Model configuration
     MODEL_TYPE = "gemini"
