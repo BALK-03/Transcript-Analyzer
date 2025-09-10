@@ -1,5 +1,5 @@
 [project]
-name = "fygurs-assessment"
+name = "transcript-analyzer"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -11,4 +11,13 @@ dependencies = [
     "openai>=1.97.1",
     "python-dotenv>=1.1.1",
     "uvicorn>=0.35.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "--ignore-glob=test_*.py"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4.2",
+    "pytest-mock>=3.15.0",
 ]

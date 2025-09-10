@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from api.routes import pipeline
 import uvicorn
 from dotenv import load_dotenv
-import paths
+from config import paths
 
 load_dotenv(paths.ENV_FILE)
 
