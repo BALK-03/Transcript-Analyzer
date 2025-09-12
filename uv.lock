@@ -731,6 +731,7 @@ dependencies = [
     { name = "google-generativeai" },
     { name = "ollama" },
     { name = "openai" },
+    { name = "pytest" },
     { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
@@ -747,6 +748,7 @@ requires-dist = [
     { name = "google-generativeai", specifier = ">=0.8.5" },
     { name = "ollama", specifier = ">=0.5.1" },
     { name = "openai", specifier = ">=1.97.1" },
+    { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8.4.2" },
     { name = "pytest-mock", marker = "extra == 'test'", specifier = ">=3.15.0" },
     { name = "python-dotenv", specifier = ">=1.1.1" },

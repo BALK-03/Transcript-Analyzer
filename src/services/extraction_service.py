@@ -5,6 +5,10 @@ from src.services.extraction.deadlines_extractor import DeadlinesExtractor
 from src.services.extraction.priority_extractor import PriorityExtractor
 from src.services.extraction.category_extractor import CategoryExtractor
 from src.models.base_model import BaseAIModel
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 class ExtractionService:
     """
@@ -13,10 +17,16 @@ class ExtractionService:
     """
     
     def __init__(self):
+        logger.debug("Initializing ExtractionService")
         self.assignees_extractor = AssigneesExtractor()
+        logger.debug("AssigneesExtractor initialized")
         self.deadlines_extractor = DeadlinesExtractor()
+        logger.debug("DeadlinesExtractor initialized")
         self.priority_extractor = PriorityExtractor()
+        logger.debug("PriorityExtractor initialized")
         self.category_extractor = CategoryExtractor()
+        logger.debug("CategoryExtractor initialized")
+        logger.info("ExtractionService successfully initialized with all extractors")
 
     def extract_from_segment(self, segment: dict[str, Any], model: BaseAIModel, debug: bool = False) -> dict[str, Any]:
         """
@@ -31,41 +41,66 @@ class ExtractionService:
         Returns:
             Clean, flat JSON with task, assignee, deadline, priority_level, and category
         """
+        segment_id = segment.get('segment_id', 'unknown')
+        logger.info(f"Starting extraction from segment {segment_id}")
+        logger.debug(f"Segment data: {repr(segment)}")
+        logger.debug(f"Debug mode enabled: {debug}")
+        
         try:
             if debug:
-                print(f"\nProcessing segment {segment.get('segment_id', 'unknown')}")
+                print(f"\nProcessing segment {segment_id}")
             
             # Step 1: Extract Assignees
+            logger.debug("Step 1: Starting assignees extraction")
             assignees_data = self.assignees_extractor.extract(segment, model, debug=debug)
+            logger.debug(f"Assignees extraction completed: {repr(assignees_data)}")
             if debug:
                 print(f"Assignees: {assignees_data}")
             
             # Step 2: Extract Deadlines (using assignees context)
+            logger.debug("Step 2: Starting deadlines extraction with assignees context")
             deadlines_data = self.deadlines_extractor.extract(segment, model, assignees_data, debug=debug)
+            logger.debug(f"Deadlines extraction completed: {repr(deadlines_data)}")
             if debug:
                 print(f"Deadlines: {deadlines_data}")
             
             # Combine data for next step
+            logger.debug("Combining assignees and deadlines data for next extraction step")
             combined_data = {**assignees_data, **deadlines_data}
+            logger.debug(f"Combined data: {repr(combined_data)}")
             
             # Step 3: Extract Priority (using previous context)
+            logger.debug("Step 3: Starting priority extraction with combined context")
             priority_data = self.priority_extractor.extract(segment, model, combined_data, debug=debug)
+            logger.debug(f"Priority extraction completed: {repr(priority_data)}")
             if debug:
                 print(f"Priority: {priority_data}")
             
             # Update combined data
+            logger.debug("Updating combined data with priority information")
             combined_data.update(priority_data)
+            logger.debug(f"Updated combined data: {repr(combined_data)}")
             
             # Step 4: Extract Category (using all previous context)
+            logger.debug("Step 4: Starting category extraction with full context")
             category_data = self.category_extractor.extract(segment, model, combined_data, debug=debug)
+            logger.debug(f"Category extraction completed: {repr(category_data)}")
             if debug:
                 print(f"Category: {category_data}")
             
             # Convert to clean, flat structure
-            return self._format_clean_output(segment, assignees_data, deadlines_data, priority_data, category_data)
+            logger.debug("Formatting extracted data into clean output structure")
+            clean_output = self._format_clean_output(segment, assignees_data, deadlines_data, priority_data, category_data)
+            logger.info(f"Extraction from segment {segment_id} completed successfully")
+            logger.debug(f"Final clean output: {repr(clean_output)}")
+            return clean_output
             
         except Exception as e:
-            print(f"ERROR: Problem occurred while extracting from segment {segment.get('segment_id', 'unknown')}: {str(e)}")
+            logger.error(f"Error occurred while extracting from segment {segment_id}: {str(e)}")
+            logger.exception("Full exception details for segment extraction error:")
+            print(f"ERROR: Problem occurred while extracting from segment {segment_id}: {str(e)}")
+            
+            logger.info(f"Returning clean structure with default values for segment {segment_id}")
             # Return clean structure with default values
             return self._format_clean_output(
                 segment, 
@@ -83,30 +118,41 @@ class ExtractionService:
         Returns:
             Clean JSON with: task, assignee, deadline, priority_level, category
         """
+        logger.debug("Formatting extracted data into clean output structure")
+        logger.debug(f"Input data - assignees: {repr(assignees_data)}, deadlines: {repr(deadlines_data)}, priority: {repr(priority_data)}, category: {repr(category_data)}")
+        
         # Extract the main assignee (first one if multiple, or "Unassigned" if none)
         assignees = assignees_data.get("assignees", [])
         main_assignee = assignees[0] if assignees else "Unassigned"
+        logger.debug(f"Main assignee determined: {main_assignee} (from {len(assignees)} total assignees)")
         
         # Extract the main deadline (first one if multiple, or "No deadline" if none)
         deadlines = deadlines_data.get("deadlines", [])
         main_deadline = deadlines[0] if deadlines else "No deadline"
+        logger.debug(f"Main deadline determined: {main_deadline} (from {len(deadlines)} total deadlines)")
         
         # Get priority level
         priority_level = priority_data.get("priority", "Medium")
+        logger.debug(f"Priority level: {priority_level}")
         
         # Get category
         category = category_data.get("category", "Other")
+        logger.debug(f"Category: {category}")
         
         # Get task description from topic summary
         task = segment.get("topic_summary", "No task description")
+        logger.debug(f"Task description: {repr(task[:100])}...")
         
-        return {
+        clean_output = {
             "task": task,
             "assignee": main_assignee,
             "deadline": main_deadline,
             "priority_level": priority_level,
             "category": category
         }
+        
+        logger.debug(f"Clean output structure created: {repr(clean_output)}")
+        return clean_output
 
     def extract_from_segments(self, segments: list[dict[str, Any]], model: BaseAIModel, debug: bool = False) -> list[dict[str, Any]]:
         """
@@ -120,12 +166,19 @@ class ExtractionService:
         Returns:
             List of segments with extracted action information
         """
+        logger.info(f"Starting extraction from {len(segments)} segments")
+        logger.debug(f"Debug mode enabled: {debug}")
+        
         extracted_segments = []
         
-        for segment in segments:
+        for i, segment in enumerate(segments):
+            logger.debug(f"Processing segment {i + 1} of {len(segments)}: {segment.get('segment_id', 'unknown')}")
             extracted_segment = self.extract_from_segment(segment, model, debug)
             extracted_segments.append(extracted_segment)
+            logger.debug(f"Segment {i + 1} extraction completed")
         
+        logger.info(f"Extraction from {len(segments)} segments completed successfully")
+        logger.debug(f"Total extracted segments: {len(extracted_segments)}")
         return extracted_segments
 
     def get_structured_action_summary(self, segments: list[dict[str, Any]], model: BaseAIModel, debug: bool = False) -> dict[str, Any]:
@@ -140,15 +193,22 @@ class ExtractionService:
         Returns:
             Structured summary with clean, flat action objects
         """
+        logger.info(f"Starting structured action summary extraction from {len(segments)} segments")
+        logger.debug(f"Debug mode enabled: {debug}")
+        
         extracted_segments = self.extract_from_segments(segments, model, debug)
+        logger.debug("All segments extracted, creating structured summary")
         
         summary = {
             "total_segments_processed": len(extracted_segments),
             "total_actions": len(extracted_segments),  # Each segment represents one action
             "actions": []  # Changed from "segments_with_actions" to "actions"
         }
+        logger.debug(f"Initial summary structure created with {len(extracted_segments)} total segments/actions")
         
-        for segment in extracted_segments:
+        meaningful_actions_count = 0
+        for i, segment in enumerate(extracted_segments):
+            logger.debug(f"Evaluating segment {i + 1} for meaningful action data")
             # Since we now return clean format directly, just add to actions list
             # Only include actions that have meaningful data (not all defaults)
             if (segment.get("assignee") != "Unassigned" or 
@@ -156,5 +216,11 @@ class ExtractionService:
                 segment.get("priority_level") != "Medium" or
                 segment.get("category") != "Other"):
                 summary["actions"].append(segment)
+                meaningful_actions_count += 1
+                logger.debug(f"Segment {i + 1} added as meaningful action")
+            else:
+                logger.debug(f"Segment {i + 1} skipped (all default values)")
         
+        logger.info(f"Structured action summary completed. {meaningful_actions_count} meaningful actions out of {len(extracted_segments)} total segments")
+        logger.debug(f"Final summary structure: {len(summary['actions'])} actions included")
         return summary

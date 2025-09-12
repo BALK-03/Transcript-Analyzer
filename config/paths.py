@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Base project directory
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # .env file
 ENV_FILE = BASE_DIR / "config" / ".env"
