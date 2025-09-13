@@ -1,5 +1,4 @@
 from typing import Any
-
 from src.services.extraction.assignee_extractor import AssigneesExtractor
 from src.services.extraction.deadlines_extractor import DeadlinesExtractor
 from src.services.extraction.priority_extractor import PriorityExtractor

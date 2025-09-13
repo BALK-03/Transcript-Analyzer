@@ -2,7 +2,6 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
-
 def get_logger(name: str, error_log_file: str = "logs/app_error.log", info_log_file: str = "logs/app_info.log"):
     os.makedirs(os.path.dirname(error_log_file), exist_ok=True)
 

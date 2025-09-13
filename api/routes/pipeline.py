@@ -1,7 +1,4 @@
-import os, sys
 from fastapi import APIRouter, HTTPException
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from api.models import PipelineRequest, PipelineResponse
 from src.services.pipeline_service import run_pipeline
 

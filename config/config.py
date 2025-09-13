@@ -4,7 +4,7 @@ from pathlib import Path
 class Config:
     """Configuration class for the pipeline."""
     # Fastapi server
-    FASTAPI_API_URL = "http://127.0.0.1:8000/pipeline"
+    FASTAPI_API_URL = "http://0.0.0.0:8000/pipeline"
     
     # File handling
     MAX_FILENAME_LENGTH = 255
