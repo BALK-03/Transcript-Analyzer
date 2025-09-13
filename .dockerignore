@@ -1,0 +1,22 @@
+# Ignore Python-specific files and directories
+__pycache__/
+*.py[cod]
+.env
+.venv
+logs/
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+
+# Ignore distribution and build artifacts
+dist/
+build/
+*.egg-info/
+
+# Ignore editor and OS files
+.DS_Store
+.dockerignore
+.gitignore
